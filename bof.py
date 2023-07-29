@@ -1,5 +1,5 @@
 #!/usr/bin/python
-
+# Bof a Slmail para practicas en python3
 from pwn import *
 import socket, sys
 
