@@ -1,6 +1,5 @@
 #!/usr/bin/python
-# Bof a Slmail para practicas en python3
-# Autor Liandd
+# Binario Windows 7 Slmail de Correos VULNERABLE a BUffer Overflow
 from pwn import *
 from struct import pack
 import socket, sys
